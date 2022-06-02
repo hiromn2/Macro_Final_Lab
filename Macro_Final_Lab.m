@@ -271,7 +271,7 @@ plot(amalla,F(:,5))
 title('\zeta_5 = 0.6')
 xlabel('a');
 
-%% Inciso 4) Changin the stochastic persistance parameter 
+% Inciso 4) Changin the stochastic persistance parameter 
 
 % Parámetros del modelo
 
