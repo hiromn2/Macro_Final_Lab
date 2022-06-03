@@ -2,33 +2,36 @@
 % -----------------------------------------------------------------------------------------
 clc; clear all; close all;
 
-% Par�metros del modelo:
+% Parametros del modelo/Model parameters:
 
-alpha = 0.33; % participaci�n del capital en la producci�n
-beta = 0.96; % factor de descuento
-delta = 0.08; % tasa de depreciaci�n del capital
-sigma = 1.5; % coeficiente de aversi�n al riesgo
-rho = 0.95; % persistencia del choque estoc�stico
-sigma_e = 0.004; % desviaci�n est�ndar de las innovacion
-
-
+alpha = 0.33; % participacion del capital en la produccion/particpation of capital in production 
+beta = 0.96; % factor de descuento/discount factor 
+delta = 0.08; % tasa de depreciacion del capital/capital depreciation rate
+sigma = 1.5; % coeficiente de aversion al riesgo/risk aversion coefficient
+rho = 0.95; % persistencia del choque estocastico/persistence of the stochastic shocks
+sigma_e = 0.004; % desviacion estandar de las innovacion/standar deviation of innovation
 
 
 
 
-%% Inciso i): M�todo de Tauchen
 
-% Definimos el número de puntos de la malla del choque
+
+%% Inciso i): Metodo de Tauchen/Tauchen method 
+
+% Definimos el número de puntos de la malla del choque/ We define the number of points from the shock mesh
 q = 5; 
-%Lo anterior nos devuelve un vector con 5 valores que son en este caso
-%-0.04, -0.02, 0, 0.02 y 0.04 y nos va a dar una maiz p que será la matriz de
-%transición, la cual nos dice, estando en dichos valores, cuál es la
-%probabilidad de que pase a los otros estados. 
+%Lo anterior nos devuelve un vector con 5 valores que son en este caso/ The above returns a vector with 5 values which are in this case
+%-0.04, -0.02, 0, 0.02 y 0.04 y nos va a dar una maiz p que será la matriz de /The vector returns a vector with 5 values which are: %-0.04, -0.02, 0, 0.02 and 0.04 and it will give us
+%transición, la cual nos dice, estando en dichos valores, cuál es la/ a matrix p which will be the matrix of
+%probabilidad de que pase a los otros estados. /which tells us, being at those values, what is the probability of passing to the other states. 
 
-% Llamamos al método de Tauchen
-[z,P] = Tauchen(rho, q, sigma_e); %P será nuestra matriz de transición
 
-%% Inciso ii): Iteración de la función de valor
+
+
+% Llamamos al método de Tauchen/We call the Tauchen method
+[z,P] = Tauchen(rho, q, sigma_e); %P será nuestra matriz de transición/P will be our transition matrix
+
+%% Inciso ii): Iteración de la función de valor /Value function iteration
 
 % Valor inicial para el capital y los precios
 K = 31; %Capital inicial
@@ -447,30 +450,30 @@ for t = 1:T
         shock(t)= z(zt(t)); %Nos dice cuál es el valor del schock
 end
 
-% Obtenemos la distribución invariante
-% La distribución invariante estára dada a partir de todas las
-% posibilidades queremos saber cuántas veces se cae en un estado en
-% particular, se ve la función de distribución acumulada
+% Obtenemos la distribución invariante/ We obtain the invariant distribution 
+% La distribución invariante estára dada a partir de todas las/ The invariant distribution will be given by all 
+% posibilidades queremos saber cuántas veces se cae en un estado en/ the posibilities we want to know how much times it is in a particular 
+% particular, se ve la función de distribución acumulada/ state, we can see the cumulative distribution
 
-% Inicializamos la matriz que almacena la distribución
-F = zeros(p,q); %p*q es el número de estados que podemos tener 
+% Inicializamos la matriz que almacena la distribución/ We let begin the distribution matrix
+F = zeros(p,q); %p*q es el número de estados que podemos tener/ p*q will be the number of states we can have 
 
-% Auxiliar que indica el estado de la economía
+% Auxiliar que indica el estado de la economía/ Indicates de state of the economy
 state = zeros(p,q); 
 
-for i=1:p % número de puntos en la malla de activos
-    for j=1:q % número de puntos en la malla del choque
-        for t=1001:10000 % no considera las primeras 1000 observaciones
+for i=1:p % número de puntos en la malla de activos/ number of points in the assets mesh
+    for j=1:q % número de puntos en la malla del choque/ number of points in the mesh of the shock
+        for t=1001:10000 % no considera las primeras 1000 observaciones/ doesn't consider the first 1000 observations
             if ai(t)==i && zt(t)==j
-                state(i,j) = state(i,j)+1; % aumenta la frecuencia de esa entrada
+                state(i,j) = state(i,j)+1; % aumenta la frecuencia de esa entrada/ increases the entry frequency
             end
         end
-        F(i,j) = state(i,j)/9000; % divide los estados entre número de observaciones para obtener la distribuci�n
+        F(i,j) = state(i,j)/9000; % divide los estados entre número de observaciones para obtener la distribucion/divides the states by the number of observations
     end
 end
 
-% Graficamos la distribución acumulativa para cada valor del choque
-% punto anterior
+% Graficamos la distribución acumulativa para cada valor del choque/ Ploting the cumulative distribution for each shock value
+% punto anterior/ last point 
 F = cumsum(F)./sum(F);
 
 figure(3)
@@ -503,8 +506,7 @@ xlabel('a');
 
 
 
-% DEFININDO TAUCHEN
-
+% FUNCION TAUCHEN/ TAUCHEN FUNCTION
 
 
 function [grid,P] = Tauchen(rho,N,sigma)
@@ -520,20 +522,20 @@ function [grid,P] = Tauchen(rho,N,sigma)
 % grid = malla del AR(1) discreto/mesh of the discrete AR(1).
 % P = matriz de transición/transition matrix.
 
-        % Construyendo la malla de valores
+        % Construyendo la malla de valores/ Building the mesh of values
         sigma_z = sqrt(sigma^2/(1-rho^2)); 
-        step =(2*sigma_z*3)/(N-1); % distancia entre puntos
-        grid = zeros(N,1); % inicializa la malla
+        step =(2*sigma_z*3)/(N-1); % distancia entre puntos/distance between points
+        grid = zeros(N,1); % inicializa la malla/beginning og mesh
         for i=1:N
-            grid(i) = -3*sigma_z+ (i-1)*step; % obtiene cada punto de la malla
+            grid(i) = -3*sigma_z+ (i-1)*step; % obtiene cada punto de la malla/obtains every point of the mesh
         end
         
-        % Construyendo la matriz de transición
+        % Construyendo la matriz de transición/Building the transition mesh
         
-        P = zeros(N,N); % inicializa la matriz P
+        P = zeros(N,N); % inicializa la matriz P/ beginning of P matrix
         if N>1 
            for i=1:N
-            P(i,1)=normcdf((grid(1)+step/2-rho*grid(i))/sigma); % usando la distribución normal
+            P(i,1)=normcdf((grid(1)+step/2-rho*grid(i))/sigma); % usando la distribución normal/ using normal distribution
             P(i,N)=1-normcdf((grid(N)-step/2-rho*grid(i))/sigma);
                 for j=2:N-1
                 P(i,j)=normcdf((grid(j)+step/2-rho*grid(i))/sigma) ...
